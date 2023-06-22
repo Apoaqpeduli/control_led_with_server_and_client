@@ -6,22 +6,22 @@
 #define MAX_SRV_CLIENTS 1
 #define PORT  80
 
-char ssid[] = "LT-4 FM";           // SSID of your home WiFi
-char pass[] = "mobitell1234";
+char ssid[] = "LOGIC";           // SSID of your home WiFi
+char pass[] = "kwato1234";
 
 //setting agar ip menjadi static
-#define staticIP "192.168.0.100"     // Desired static IP address
-#define gate "192.168.0.1"       // IP address of your gateway/router
+#define staticIP "192.168.1.100"     // Desired static IP address
+#define gate "192.168.1.1"       // IP address of your gateway/router
 #define subnet "255.255.255.0"    // Subnet mask
 
 //setting pin
-int flip;
-int alarm_pin;
-int alarm_wifi;
-int led_wifi;
+int flip= 22;
+int alarm_pin= 23;
+int alarm_wifi= 18;
+int led_wifi= 19;
 int jumlah_pin = 6;
-int sw[6] = {12, 0, 0, 0, 0, 0};
-int led[6] = {13, 0, 0, 0, 0, 0};
+int sw[] = {15, 12, 4, 16, 17, 5};
+int led[] = {35, 32, 33, 26, 27, 14};
 
 //data sw
 int d_sw[6] = {1, 1, 1, 1, 1, 1};
@@ -37,8 +37,8 @@ int i;
 boolean parsing = false;
 
 //delay
-const unsigned long onTime_flip = 20;
-const unsigned long offTime_flip = 300;
+const unsigned long onTime_flip = 200;
+const unsigned long offTime_flip = 1000;
 const unsigned long u_status = 2000;
 const unsigned long delay_data = 100;
 const unsigned long delay_button = 1000;
@@ -51,11 +51,15 @@ int kondisi_flip = 0;
 void setup() {
   Serial.begin(9600);
 
-  for (int a = 0; a <= 0; a++) {
+  for (int a = 0; a <= jumlah_pin-1; a++) {
     Serial.println(a);
     pinMode(sw[a], INPUT_PULLUP);
     pinMode(led[a], OUTPUT);
   }
+  pinMode(flip, OUTPUT);
+  pinMode(alarm_pin, OUTPUT);
+  pinMode(alarm_wifi, OUTPUT);
+  pinMode(led_wifi, OUTPUT);
 
   IPAddress staticIPAddr, gatewayIPAddr, subnetMaskAddr;
   staticIPAddr.fromString(staticIP);
@@ -82,8 +86,8 @@ void setup() {
   attachDelayCommand_ms(check_data_masuk, delay_data, 0);
   attachDelayCommand_ms(check_tombol, delay_button, 1);
   attachDelayCommand_ms(check_status, u_status, 2);
-  //attachDelayCommand_ms(flip_flop_on, onTime_flip, 3);
-  //attachDelayCommand_ms(flip_flop_off, offTime_flip, 4);
+  attachDelayCommand_ms(flip_flop_on, 1, 3);
+  //attachDelayCommand_ms(flip_flop_off, offTime_flip, 4); //tidak terpakai
 }
 
 void loop() {
@@ -183,23 +187,23 @@ void check_tombol() {
   for (int a = 0; a <= jumlah_pin - 1; a++) {
     if (d_sw[a] == 0 && d_sw1[a] == 0 ) {
       Serial.printf("Led Nyla : %d\n", led[a]);
-      //digitalWrite(led[a],HIGH);
-      //digitalWrite(alarm,LOW);
+      digitalWrite(led[a],HIGH);
+      //digitalWrite(alarm_pin,LOW);
 
     }
     else if (d_sw[a] == 0 && d_sw1[a] == 1) {
       Serial.println("Alarm nyala");
-      //digitalWrite(alarm,HIGH);
+      digitalWrite(alarm_pin,HIGH);
     }
     else if (d_sw[a] == 1 && d_sw1[a] == 0) {
       Serial.println("Alarm nyala");
-      //digitalWrite(alarm,HIGH);
+      ///digitalWrite(alarm_pin,HIGH);
     }
     else {
       count = 0;
       Serial.printf("Led Mati : %d\n", led[a]);
       //digitalWrite(alarm, LOW);
-      //digitalWrite(led[a],LOW);
+      digitalWrite(led[a],LOW);
     }
   }
 }
@@ -226,6 +230,8 @@ void check_status() {
         }
         serverClients[i] = server.available();
         Serial.print("New client: "); Serial.println(i);
+        digitalWrite(led_wifi, HIGH);
+        digitalWrite(alarm_wifi, LOW);
         break;
       }
     }
@@ -238,8 +244,8 @@ void check_status() {
   }
 
   if (WiFi.status() != WL_CONNECTED) {
-    //digitalWrite(led_wifi, LOW);
-    //digitalWrite(alarm_wifi, HIGH);
+    digitalWrite(led_wifi, LOW);
+    digitalWrite(alarm_wifi, HIGH);
     Serial.println("hubungkan kembali");
     connectToWiFi();
   }
@@ -257,15 +263,18 @@ void connectToWiFi() {
 }
 
 void flip_flop_on() {
-  //digitalWrite(flip, HIGH);
-  Serial.println("flip nyala");
+  digitalWrite(flip, HIGH);
+  delay(onTime_flip);
+  digitalWrite(flip, LOW);
+  delay(offTime_flip);
+  //Serial.println("flip nyala");
   kondisi_flip = 1;
 }
 
 void flip_flop_off() {
   if (kondisi_flip == 1) {
-    //digitalWrite(flip,LOW);
-    Serial.println("flip mati");
+    digitalWrite(flip,LOW);
+    //Serial.println("flip mati");
     kondisi_flip = 0;
   }
 }
