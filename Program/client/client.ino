@@ -147,6 +147,9 @@ void check_tombol() {
 
   if (zeroCount1 == 6 && zeroCount == 6) {
     digitalWrite(alarm_pin,LOW);
+    for (int a = 0; a <= jumlah_pin - 1; a++) {
+      digitalWrite(led[a],LOW);
+    }
     return;
   }
 
@@ -159,12 +162,12 @@ void check_tombol() {
 
     }
     else if (d_sw[a] == 0 && d_sw1[a] == 1) {
-      Serial.println("Alarm nyala");
-      //digitalWrite(alarm_pin,HIGH);
+      Serial.println("Alarm mati");
+      digitalWrite(alarm_pin,LOW);
     }
     else if (d_sw[a] == 1 && d_sw1[a] == 0) {
       Serial.println("Alarm nyala");
-      //digitalWrite(alarm_pin,HIGH);
+      digitalWrite(alarm_pin,HIGH);
     }
     else {
       count = 0;
