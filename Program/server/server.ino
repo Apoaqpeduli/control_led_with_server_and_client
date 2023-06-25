@@ -195,12 +195,12 @@ void check_tombol() {
 
     }
     else if (d_sw[a] == 0 && d_sw1[a] == 1) {
-      Serial.println("Alarm nyala");
-      digitalWrite(alarm_pin,HIGH);
-    }
-    else if (d_sw[a] == 1 && d_sw1[a] == 0) {
       Serial.println("Alarm mati");
       digitalWrite(alarm_pin,LOW);
+    }
+    else if (d_sw[a] == 1 && d_sw1[a] == 0) {
+      Serial.println("Alarm nyala");
+      digitalWrite(alarm_pin,HIGH);
     }
     else {
       count = 0;
